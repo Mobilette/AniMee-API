@@ -20,7 +20,7 @@ exports.getEpisodeFromToday = function(req, res){
                       return anime;
                     });
                   result = sortAnimeByDate(result);
-                  res.json({anime :result, total : result.length});
+                  res.json(result);
                 }).catch(error => {
                   res.json({message : error, type : 'error'})
                 });
