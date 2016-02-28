@@ -8,12 +8,10 @@ function sortAnimeByDate(animes){
   });
 };
 
+
+
 exports.getEpisodeFromToday = function(req, res){
-  var query = 'browse/anime?'
-  query += 'sort=score-desc';
-  query += '&status=Currently%20Airing&airing_data=true';
-  query += '&full_page=true';
-  anilistService.executeRequest(query)
+  anilistService.executeRequest()
                 .then(data => {
                   var result = data.filter(function(anime){
                     if(anime.airing !== null)
@@ -25,3 +23,23 @@ exports.getEpisodeFromToday = function(req, res){
                   res.json({message : error, type : 'error'})
                 });
 };
+
+exports.getEpisodeByDate = function (req, res){
+      var dateSearch = new Date(req.body.dateSearch);
+      if(dateSearch == null)
+        res.json({message : "dateSearch missing in your request!", type : 'error'});
+      if(typeof(dateSearch) != "object")
+        res.json({message : "dateSearch must be a date", type : 'error'});
+      anilistService.executeRequest()
+                    .then(data => {
+                      var result = data.filter(function(anime){
+                        if(anime.airing !== null)
+                          if(new Date(anime.airing.time).toDateString() === dateSearch.toDateString())
+                            return anime;
+                        });
+                      result = sortAnimeByDate(result);
+                      res.json(result);
+                    }).catch(error => {
+                      res.json({message : error, type : 'error'})
+                    });
+  };
